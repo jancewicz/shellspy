@@ -2,9 +2,9 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/jancewicz/shellspy"
 )
@@ -12,12 +12,17 @@ import (
 // Your CLI goes here!
 func main() {
 	reader := bufio.NewReader(os.Stdin)
+	command, _ := reader.ReadString('\n')
+	command = strings.TrimSpace(command)
 
-	text, _ := reader.ReadString('\n')
-	cmd, err := shellspy.CommandFromInput(text)
+	cmd, err := shellspy.CommandFromInput(command)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(cmd)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		log.Fatal(err)
+	}
 }

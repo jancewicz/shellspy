@@ -1,6 +1,8 @@
 package shellspy_test
 
 import (
+	"bufio"
+	"os"
 	"testing"
 
 	"github.com/jancewicz/shellspy"
@@ -8,14 +10,16 @@ import (
 
 // Your tests go here!
 func TestCommandInput(t *testing.T) {
-	input := "ls"
+	reader := bufio.NewReader(os.Stdin)
 
-	cmd, err := shellspy.CommandFromInput(input)
+	command, _ := reader.ReadString('\n')
+
+	cmd, err := shellspy.CommandFromInput(command)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if cmd.Args[0] != input {
-		t.Errorf("provided args are not the same as user input, got: %s, want: %s", cmd.Args[0], input)
+	if cmd.Args[0] != command {
+		t.Errorf("provided args are not the same as user input, got: %s, want: %s", cmd.Args[0], command)
 	}
 }
