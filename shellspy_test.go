@@ -2,7 +2,11 @@ package shellspy_test
 
 import (
 	"bufio"
+	"bytes"
+	"io"
+	"log"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/jancewicz/shellspy"
@@ -10,16 +14,36 @@ import (
 
 // Your tests go here!
 func TestCommandInput(t *testing.T) {
-	reader := bufio.NewReader(os.Stdin)
+	input := strings.NewReader("pwd")
+	expected := "/home/jancewicz/Repos/shellspy"
 
-	command, _ := reader.ReadString('\n')
+	scanner := bufio.NewScanner(input)
+
+	scanner.Scan()
+	if err := scanner.Err(); err != nil {
+		t.Fatal(err)
+	}
+	command := scanner.Text()
 
 	cmd, err := shellspy.CommandFromInput(command)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if cmd.Args[0] != command {
-		t.Errorf("provided args are not the same as user input, got: %s, want: %s", cmd.Args[0], command)
+	r, w, _ := os.Pipe()
+
+	cmd.Stdout = w
+	if err := cmd.Run(); err != nil {
+		log.Fatal(err)
+	}
+
+	w.Close()
+
+	var buf bytes.Buffer
+	io.Copy(&buf, r)
+	result := strings.TrimSpace(buf.String())
+
+	if result != expected {
+		t.Errorf("wrong output, got: %s, want: %s", strings.TrimSpace(buf.String()), expected)
 	}
 }
