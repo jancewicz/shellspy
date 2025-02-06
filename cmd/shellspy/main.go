@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -9,8 +10,10 @@ import (
 
 // Your CLI goes here!
 func main() {
+	fmt.Println("Recording session to 'shellspy.txt'")
 
 	for {
+		fmt.Print("> ")
 		command := shellspy.ReadUserInput()
 		if command == "exit" {
 			break
@@ -21,10 +24,11 @@ func main() {
 			log.Fatal(err)
 		}
 
-		file, err := os.Create("logger.txt")
+		file, err := os.Create("shellspy.txt")
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		defer file.Close()
 
 		cmd.Stdout = os.Stdout
