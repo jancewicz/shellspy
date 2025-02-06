@@ -3,6 +3,9 @@ package shellspy
 import (
 	"bufio"
 	"errors"
+	"fmt"
+	"io"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -25,4 +28,29 @@ func CommandFromInput(input string) (*exec.Cmd, error) {
 		cmd.Err = nil
 	}
 	return cmd, nil
+}
+
+func RunShell(file *os.File) {
+	for {
+		fmt.Print("> ")
+		command := ReadUserInput()
+		io.WriteString(file, ("> " + command + "\n"))
+
+		if command == "exit" {
+			break
+		}
+
+		cmd, err := CommandFromInput(command)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		cmd.Stdout = io.MultiWriter(file, os.Stdout)
+		cmd.Stderr = os.Stderr
+
+		if err := cmd.Run(); err != nil {
+			log.Fatal(err)
+		}
+		io.WriteString(file, "\n")
+	}
 }
