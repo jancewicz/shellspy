@@ -19,7 +19,7 @@ func main() {
 	fmt.Println("Recording session to 'shellspy.txt'")
 	readInput := shellspy.ReadUserInput
 
-	if err := shellspy.RunShell(file, readInput); err != nil {
+	if err := shellspy.RunShell(readInput, file); err != nil {
 		log.Fatal(err)
 	}
 }

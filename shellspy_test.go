@@ -75,7 +75,7 @@ func TestRunShell(t *testing.T) {
 	commands := []string{"ls", "pwd", "echo hello"}
 	readInput := MockReadingInput(commands)
 
-	err = shellspy.RunShell(file, readInput)
+	err = shellspy.RunShell(readInput, file)
 	if err != nil {
 		t.Fatalf("error occured during running the shell: %v", err)
 	}

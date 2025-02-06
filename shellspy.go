@@ -44,7 +44,7 @@ func RedirectOutput(cmd *exec.Cmd, file *os.File) {
 	cmd.Stderr = os.Stderr
 }
 
-func RunShell(file *os.File, readInput func() string) error {
+func RunShell(readInput func() string, file *os.File) error {
 	for {
 		fmt.Print("> ")
 		command := readInput()
