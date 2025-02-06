@@ -44,10 +44,10 @@ func RedirectOutput(cmd *exec.Cmd, file *os.File) {
 	cmd.Stderr = os.Stderr
 }
 
-func RunShell(file *os.File) error {
+func RunShell(file *os.File, readInput func() string) error {
 	for {
 		fmt.Print("> ")
-		command := ReadUserInput()
+		command := readInput()
 		io.WriteString(file, ("> " + command + "\n"))
 
 		if command == "exit" {
