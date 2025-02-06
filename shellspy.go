@@ -16,10 +16,13 @@ func ReadUserInput() string {
 }
 
 func CommandFromInput(input string) (*exec.Cmd, error) {
-	cmd := exec.Command(input)
+	commands := strings.Fields(input)
+	initCmd := commands[0]
+	optCmds := commands[1:]
+
+	cmd := exec.Command(initCmd, optCmds...)
 	if errors.Is(cmd.Err, exec.ErrDot) {
 		cmd.Err = nil
 	}
-
 	return cmd, nil
 }
