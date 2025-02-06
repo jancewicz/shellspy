@@ -18,5 +18,7 @@ func main() {
 
 	fmt.Println("Recording session to 'shellspy.txt'")
 
-	shellspy.RunShell(file)
+	if err := shellspy.RunShell(file); err != nil {
+		log.Fatal(err)
+	}
 }
