@@ -1,25 +1,37 @@
 package main
 
-import (
-	"fmt"
-	"log"
-	"os"
+import "log"
 
-	"github.com/jancewicz/shellspy"
-)
+var version = "0.0.1"
 
 // Your CLI goes here!
 func main() {
-	file, err := os.Create("shellspy.txt")
-	if err != nil {
-		log.Fatal(err)
+	// file, err := os.Create("shellspy.txt")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// defer file.Close()
+
+	// fmt.Println("Recording session to 'shellspy.txt'")
+	// readInput := shellspy.ReadUserInput
+
+	// if err := shellspy.RunShell(readInput, file); err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	cfg := config{
+		addr: ":8080",
+		env:  "DEV",
 	}
-	defer file.Close()
 
-	fmt.Println("Recording session to 'shellspy.txt'")
-	readInput := shellspy.ReadUserInput
+	app := &application{
+		config: cfg,
+	}
 
-	if err := shellspy.RunShell(readInput, file); err != nil {
+	mux := app.mount()
+
+	err := app.run(mux)
+	if err != nil {
 		log.Fatal(err)
 	}
 }
