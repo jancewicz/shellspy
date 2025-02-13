@@ -3,22 +3,19 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
+	"os"
 )
 
 // Your CLI goes here!
 func main() {
-	// file, err := os.Create("shellspy.txt")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer file.Close()
+	file, err := os.Create("shellspy.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
 
-	// fmt.Println("Recording session to 'shellspy.txt'")
-	// readInput := shellspy.ReadUserInput
-
-	// if err := shellspy.RunShell(readInput, file); err != nil {
-	// 	log.Fatal(err)
-	// }
+	fmt.Println("Recording session to 'shellspy.txt'")
 
 	flag.Parse()
 	if *listen {
@@ -34,5 +31,5 @@ func main() {
 	serverHost := flag.Arg(0)
 	serverPort := flag.Arg(1)
 
-	startClient(fmt.Sprintf("%s:%s", serverHost, serverPort))
+	startClient(fmt.Sprintf("%s:%s", serverHost, serverPort), file)
 }

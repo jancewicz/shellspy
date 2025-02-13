@@ -7,6 +7,8 @@ import (
 	"log"
 	"net"
 	"os"
+
+	"github.com/jancewicz/shellspy"
 )
 
 var (
@@ -43,16 +45,17 @@ func proccessClient(conn net.Conn) {
 	conn.Close()
 }
 
-func startClient(addr string) {
+func startClient(addr string, file *os.File) {
 	conn, err := net.Dial("tcp", addr)
 	if err != nil {
 		fmt.Printf("can't connet to server on addres: %s", addr)
 		return
 	}
 
+	shellspy.RunShell(file, conn)
+
 	_, err = io.Copy(conn, os.Stdin)
 	if err != nil {
 		fmt.Printf("connection error: %s", err)
 	}
-
 }

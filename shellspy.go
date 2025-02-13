@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"os"
 	"os/exec"
 	"strings"
@@ -30,8 +31,6 @@ func CommandFromInput(input string) (*exec.Cmd, error) {
 }
 
 func HandleCommand(cmd *exec.Cmd, file *os.File) error {
-	RedirectOutput(cmd, file)
-
 	if err := cmd.Run(); err != nil {
 		return err
 	}
@@ -39,15 +38,10 @@ func HandleCommand(cmd *exec.Cmd, file *os.File) error {
 	return nil
 }
 
-func RedirectOutput(cmd *exec.Cmd, file *os.File) {
-	cmd.Stdout = io.MultiWriter(file, os.Stdout)
-	cmd.Stderr = os.Stderr
-}
-
-func RunShell(readInput func() string, file *os.File) error {
+func RunShell(file *os.File, conn net.Conn) error {
 	for {
 		fmt.Print("> ")
-		command := readInput()
+		command := ReadUserInput()
 		io.WriteString(file, ("> " + command + "\n"))
 
 		if command == "exit" {
@@ -58,6 +52,9 @@ func RunShell(readInput func() string, file *os.File) error {
 		if err != nil {
 			return err
 		}
+
+		cmd.Stdout = io.MultiWriter(file, conn, os.Stdout)
+		cmd.Stderr = os.Stderr
 
 		if err := HandleCommand(cmd, file); err != nil {
 			return err
