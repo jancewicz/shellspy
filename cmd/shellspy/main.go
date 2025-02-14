@@ -15,8 +15,6 @@ func main() {
 	}
 	defer file.Close()
 
-	fmt.Println("Recording session to 'shellspy.txt'")
-
 	flag.Parse()
 	if *listen {
 		startServer()
@@ -31,5 +29,5 @@ func main() {
 	serverHost := flag.Arg(0)
 	serverPort := flag.Arg(1)
 
-	startClient(fmt.Sprintf("%s:%s", serverHost, serverPort), file)
+	startClient(fmt.Sprintf("%s:%s", serverHost, serverPort))
 }

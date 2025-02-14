@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"io"
@@ -35,27 +36,47 @@ func startServer() {
 			go proccessClient(conn)
 		}
 	}
+
 }
 
 func proccessClient(conn net.Conn) {
-	_, err := io.Copy(os.Stdout, conn)
-	if err != nil {
-		fmt.Println(err)
+	defer conn.Close()
+
+	reader := bufio.NewReader(conn)
+	// writer := bufio.NewWriter(conn)
+
+	for {
+		command := shellspy.ReadUserInput(reader, conn)
+
+		if command == "exit" {
+			fmt.Println("connection closed")
+			conn.Close()
+		}
+
+		cmd, err := shellspy.CommandFromInput(command)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		cmd.Stdout = io.MultiWriter(os.Stdout)
+		cmd.Stderr = os.Stderr
+
+		if err := shellspy.HandleCommand(cmd); err != nil {
+			log.Fatal(err)
+		}
 	}
-	conn.Close()
 }
 
-func startClient(addr string, file *os.File) {
+func startClient(addr string) {
 	conn, err := net.Dial("tcp", addr)
 	if err != nil {
 		fmt.Printf("can't connet to server on addres: %s", addr)
 		return
 	}
 
-	shellspy.RunShell(file, conn)
-
-	_, err = io.Copy(conn, os.Stdin)
+	_, err = io.Copy(conn, os.Stdout)
 	if err != nil {
 		fmt.Printf("connection error: %s", err)
 	}
+	fmt.Println("Recording session to 'shellspy.txt'")
 }
