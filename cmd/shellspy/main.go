@@ -1,39 +1,24 @@
 package main
 
 import (
-	"log"
+	"flag"
+	"fmt"
 )
 
-var version = "0.0.1"
-
-// Your CLI goes here!
 func main() {
-	// file, err := os.Create("shellspy.txt")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer file.Close()
-
-	// fmt.Println("Recording session to 'shellspy.txt'")
-	// readInput := shellspy.ReadUserInput
-
-	// if err := shellspy.RunShell(readInput, file); err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	cfg := config{
-		addr: ":8080",
-		env:  "DEV",
+	flag.Parse()
+	if *listen {
+		startServer()
+		return
 	}
 
-	app := &application{
-		config: cfg,
+	if len(flag.Args()) < 2 {
+		fmt.Println("host and port number required")
+		return
 	}
 
-	mux := app.mount()
+	serverHost := flag.Arg(0)
+	serverPort := flag.Arg(1)
 
-	err := app.run(mux)
-	if err != nil {
-		log.Fatal(err)
-	}
+	startClient(fmt.Sprintf("%s:%s", serverHost, serverPort))
 }
