@@ -36,17 +36,25 @@ func startServer() {
 			go proccessClient(conn)
 		}
 	}
-
 }
 
 func proccessClient(conn net.Conn) {
 	defer conn.Close()
 
+	file, err := os.Create("shellspy.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
 	reader := bufio.NewReader(conn)
-	// writer := bufio.NewWriter(conn)
+	writer := io.MultiWriter(conn, file)
 
 	for {
 		command := shellspy.ReadUserInput(reader, conn)
+
+		writer.Write([]byte("> " + command))
+		writer.Write([]byte("\n"))
 
 		if command == "exit" {
 			fmt.Println("connection closed")
@@ -58,7 +66,7 @@ func proccessClient(conn net.Conn) {
 			log.Fatal(err)
 		}
 
-		cmd.Stdout = io.MultiWriter(os.Stdout)
+		cmd.Stdout = io.MultiWriter(os.Stdout, writer)
 		cmd.Stderr = os.Stderr
 
 		if err := shellspy.HandleCommand(cmd); err != nil {

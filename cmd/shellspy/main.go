@@ -3,17 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
-	"os"
 )
 
-// Your CLI goes here!
 func main() {
-	file, err := os.Create("shellspy.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
 
 	flag.Parse()
 	if *listen {
